@@ -265,7 +265,7 @@ function generateTheme({
   mainLessFile,
   varFile,
   outputFilePath,
-  themeVariables = ['@theme-color']
+  themeVariables
 }) {
   return new Promise((resolve, reject) => {
     /*
@@ -273,6 +273,7 @@ function generateTheme({
       
       - stylesDir - styles directory containing all less files
       - varFile - variable file containing your custom variables
+      - mainLessFile - less main file which imports all styles
     */
     let content = '';
     const hashCode = hash.sha256().update(content).digest('hex');
@@ -282,7 +283,7 @@ function generateTheme({
     }
     hashCache = hashCode;
     let themeCompiledVars = {};
-    let themeVars = themeVariables || ["@theme-color"];
+    let themeVars = themeVariables || [];
     const lessPaths = [
       stylesDir
     ];
@@ -296,13 +297,20 @@ function generateTheme({
       })
       .then(([mappings, colorsLess]) => {
         let css = "";
+        /*
+         If not pass in themeVariables, the variables in varFile will be used
+         */
+        if (!themeVariables) {
+            let varJs = lessToJs(fs.readFileSync(varFile, 'utf8'));
+            themeVars.forEach(varName => {
+                delete varJs[varName];
+            });
+            themeVars.push(...Object.keys(varJs));
+        }
+        if (!themeVars.length) {
+            themeVars.push("@theme-color");
+        }
         themeVars = themeVars.filter(name => name in mappings);
-
-        let varJs = lessToJs(fs.readFileSync(varFile, 'utf8'));
-        themeVars.forEach(varName => {
-            delete varJs[varName];
-        });
-        themeVars.push(...Object.keys(varJs));
         themeVars.forEach(varName => {
           const color = mappings[varName];
           css = `.${varName.replace("@", "")} { color: ${color}; }\n ${css}`;
