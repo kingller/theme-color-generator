@@ -1,0 +1,23 @@
+{
+  "name": "theme-color-generator-example-basic",
+  "version": "1.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.6.1",
+    "react-color": "^2.14.1",
+    "react-dom": "^16.6.1",
+    "react-scripts": "^2.1.1",
+    "theme-color-generator": "^1.1.0"
+  },
+  "scripts": {
+    "start": "npm run color && react-scripts start",
+    "build": "react-app-rewired build",
+    "color": "node color.js"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
