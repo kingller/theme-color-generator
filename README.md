@@ -10,7 +10,7 @@ const { generateTheme } = require('theme-color-generator');
 const options = {
   stylesDir: path.join(__dirname, './src/styles'), // styles directory containing all less files
   varFile: path.join(__dirname, './src/styles/variables.less'), // include all color variables in `varFile` that you want to change dynamically
-  mainLessFile: path.join(__dirname, './src/styles/index.less'), // less main file which imports all styles (If not set, some redundant classes may be left)
+  mainLessFile: path.join(__dirname, './src/styles/index.less'), // less main file which imports all styles (If not set, some duplicate classes may be left)
   themeVariables: ['@theme-color'], // Specify variables to use (If not set, all variables in varFile will be used)
   outputFilePath: path.join(__dirname, './public/color.less') // if provided, file will be created with generated less/styles
 }
