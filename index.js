@@ -276,12 +276,12 @@ function generateTheme({
       - mainLessFile - less main file which imports all styles
     */
     let content = '';
-    const hashCode = hash.sha256().update(content).digest('hex');
-    if(hashCode === hashCache){
-      resolve(cssCache);
-      return;
-    }
-    hashCache = hashCode;
+    // const hashCode = hash.sha256().update(content).digest('hex');
+    // if(hashCode === hashCache){
+    //   resolve(cssCache);
+    //   return;
+    // }
+    // hashCache = hashCode;
     let themeCompiledVars = {};
     let themeVars = themeVariables || [];
     const lessPaths = [
