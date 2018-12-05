@@ -108,6 +108,7 @@ const reducePlugin = postcss.plugin("reducePlugin", (themeCompiledVars) => {
           !decl.prop.includes("background") &&
           !decl.prop.includes("border") &&
           !decl.prop.includes("box-shadow") &&
+          !decl.prop.includes("outline") &&
           !decl.prop.includes("stroke") ||
           !decl.value.includes("#") &&
           !decl.value.includes("rgb") &&
