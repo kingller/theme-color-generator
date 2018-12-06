@@ -7,6 +7,7 @@ const bundle = require("less-bundle-promise");
 const hash = require("hash.js");
 const NpmImportPlugin = require('less-plugin-npm-import');
 const lessToJs = require('less-vars-to-js');
+var CleanCSS = require('clean-css');
 
 let hashCache = "";
 let cssCache = "";
@@ -257,6 +258,32 @@ function getCssModulesStyles(stylesDir) {
 }
 
 /*
+ remove duplicate css
+ */
+function uniqueCss(css) {
+    if (!css) {
+        return '';
+    }
+
+    css = new CleanCSS({
+        compatibility: 'ie9',
+        format: {
+            breaks: {afterAtRule: true, afterRuleEnds: true}
+        }
+    }).minify(css).styles;
+
+    let array = css.split('\n');
+    let res = [];
+    for (let i = 0, len = array.length; i < len; i++) {
+        let current = array[i];
+        if (res.indexOf(current) === -1) {
+            res.push(current);
+        }
+    }
+    return res.join('\n');
+}
+
+/*
   This is main function which call all other functions to generate color.less file which contains all color
   related css rules based on your custom styles
   By default color.less will be generated in /public directory
@@ -368,6 +395,9 @@ function generateTheme({
           css = `${varName}: ${mappings[varName]};\n${css}\n`;
         });
         css = css.replace(/\n+/g, '\n');
+
+        css = uniqueCss(css);
+
         if (outputFilePath) {
           fs.writeFileSync(outputFilePath, css);
           console.log(
