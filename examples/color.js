@@ -4,7 +4,6 @@ const { generateTheme } = require('theme-color-generator');
 const options = {
     stylesDir: path.join(__dirname, './src/styles'),
     varFile: path.join(__dirname, './src/styles/vars.less'),
-    mainLessFile: path.join(__dirname, './src/styles/main.less'),
     themeVariables: [
         '@primary-color',
         '@secondary-color'
