@@ -2,6 +2,11 @@
 
 This script generates color specific styles/less file which you can use to change theme dynamically in browser
 
+## Install
+```
+$ npm install theme-color-generator
+```
+
 ## Example:
 
 ```
