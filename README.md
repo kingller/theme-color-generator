@@ -29,6 +29,9 @@ generateTheme(options).then(less => {
 ```
 ## Note: include all color variables in `varFile` that you want to change dynamically and assign them unique color codes. Don't assign same color to two or more variables and don't use `#fff`, `#ffffff`, `#000` or `#000000`. If you still want white or black color as default, slightly change it e.g. `#fffffe` or `#000001` which will not replace common background colors from other components.
 
+## You can switch theme in two ways:
+
+### First way
 Add following lines in your main html file
 
 ```
@@ -49,3 +52,6 @@ window.less.modifyVars({
   '@theme-color': '#0035ff'
 })
 ```
+
+### Second way
+You can go to [theme-color-toggle](https://github.com/kingller/theme-color-toggle) to see the usage
