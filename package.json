@@ -6,7 +6,8 @@
     "css",
     "dynamic-theme",
     "less",
-    "theme"
+    "theme",
+    "theme-color"
   ],
   "repository": {
     "type": "git",
