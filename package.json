@@ -3,13 +3,13 @@
   "version": "1.2.0",
   "description": "This a script to generate color specific styles less file and which you can use to change theme dynamically in browser",
   "keywords": [
-    "color-generator",
+    "color",
     "css",
     "dynamic-theme",
+    "generator",
     "less",
     "theme",
-    "theme-color",
-    "theme-generator"
+    "theme-color"
   ],
   "repository": {
     "type": "git",
