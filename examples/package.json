@@ -2,17 +2,19 @@
   "name": "theme-color-generator-example-basic",
   "version": "1.0.0",
   "private": true,
+  "homepage": ".",
+  "scripts": {
+    "build": "react-app-rewired build",
+    "color": "node color.js",
+    "start": "npm run color && react-scripts start"
+  },
   "dependencies": {
     "react": "^16.6.1",
+    "react-app-rewired": "^1.6.2",
     "react-color": "^2.14.1",
     "react-dom": "^16.6.1",
     "react-scripts": "^2.1.1",
     "theme-color-generator": "^1.2.0"
-  },
-  "scripts": {
-    "start": "npm run color && react-scripts start",
-    "build": "react-app-rewired build",
-    "color": "node color.js"
   },
   "browserslist": [
     ">0.2%",
