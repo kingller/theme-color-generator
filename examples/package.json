@@ -4,7 +4,7 @@
   "private": true,
   "homepage": ".",
   "scripts": {
-    "build": "react-app-rewired build",
+    "build": "npm run color && react-app-rewired build",
     "color": "node color.js",
     "start": "npm run color && react-scripts start"
   },
