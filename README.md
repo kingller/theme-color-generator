@@ -7,6 +7,9 @@ This script generates color specific styles/less file which you can use to chang
 $ npm install theme-color-generator
 ```
 
+## Demo
+Try out the [demo](https://kingller.github.io/theme-color-generator/)
+
 ## Example:
 
 ```
