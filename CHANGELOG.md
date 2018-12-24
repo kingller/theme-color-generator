@@ -9,5 +9,8 @@
 # Next
 
 
+# 1.2.1
+1. <font color=green>新增</font> Online Demo
+
 # 1.2.0
 1. <font color=blue>增强</font> 去除重复样式
