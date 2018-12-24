@@ -57,4 +57,4 @@ window.less.modifyVars({
 ```
 
 ### Second way
-You can go to [theme-color-toggle](https://github.com/kingller/theme-color-toggle) to see the usage
+You can go to [theme-color-switch](https://github.com/kingller/theme-color-switch) to see the usage
