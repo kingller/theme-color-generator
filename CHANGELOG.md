@@ -8,6 +8,8 @@
 
 # Next
 
+# 1.2.2
+1. <font color=green>修改</font> `README.md`
 
 # 1.2.1
 1. <font color=green>新增</font> Online Demo
