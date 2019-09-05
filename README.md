@@ -20,7 +20,9 @@ const options = {
   varFile: path.join(__dirname, './src/styles/variables.less'), // include all color variables in `varFile` that you want to change dynamically
   mainLessFile: path.join(__dirname, './src/styles/index.less'), // (Optional) less main file which imports all styles
   themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used)
-  outputFilePath: path.join(__dirname, './public/color.less') // if provided, file will be created with generated less/styles
+  outputFilePath: path.join(__dirname, './public/color.less'), // if provided, file will be created with generated less/styles
+  include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value.
+  options: {} // (Optional) less options
 }
 
 generateTheme(options).then(less => {

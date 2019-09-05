@@ -8,6 +8,10 @@
 
 # Next
 
+# 1.3.0
+1. <font color=green>新增</font> `include`指定包含文件
+2. <font color=green>新增</font> `options`设置`less`参数
+
 # 1.2.2
 1. <font color=green>修改</font> `README.md`
 

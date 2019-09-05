@@ -162,12 +162,11 @@ function getMatches(string, regex) {
 /*
   This function takes less input as string and compiles into css.
 */
-function render(text, paths) {
-  return less.render.call(less, text, {
-    paths: paths,
+function render(text, options) {
+  return less.render.call(less, text, Object.assign({
     javascriptEnabled: true,
     plugins: [new NpmImportPlugin({ prefix: '~' })]
-  });
+  }, options));
 }
 
 /*
@@ -234,19 +233,35 @@ function isValidColor(color) {
   );
 }
 
-function getCssModulesStyles(stylesDir) {
-  const styles = glob.sync(path.join(stylesDir, './**/*.less'));
+function getCssModulesStyles(stylesDir, include, options) {
+  let styles = [];
+  if (include) {
+      if (!Array.isArray(include)) {
+          include = null;
+          console.error('theme-color-generator: Compiler option \'include\' requires a value of type Array');
+      }
+  }
+  if (!include || include.length === 0) {
+      include = ['./**/*.less'];
+  }
+  include.forEach(function(dir) {
+      if (dir && /^(\.{0,2}|~)\//.test(dir)) {
+          dir = path.join(stylesDir, dir);
+      }
+      styles.push(...glob.sync(dir))
+  });
+
   return Promise.all(
     styles.map(p =>
       less
-        .render(fs.readFileSync(p).toString(), {
+        .render(fs.readFileSync(p).toString(), Object.assign({
           paths: [
             stylesDir,
           ],
           filename: path.resolve(p),
           javascriptEnabled: true,
           plugins: [new NpmImportPlugin({ prefix: '~' })],
-        })
+        }, options))
         .catch(() => '\n')
     )
   )
@@ -293,7 +308,9 @@ function generateTheme({
   mainLessFile,
   varFile,
   outputFilePath,
-  themeVariables
+  themeVariables,
+  include,
+  options
 }) {
   return new Promise((resolve, reject) => {
     /*
@@ -345,7 +362,7 @@ function generateTheme({
         });
 
         css = `${colorsLess}\n${css}`;
-        return render(css, lessPaths).then(({ css }) => [
+        return render(css, Object.assign({ paths: lessPaths }, options)).then(({ css }) => [
           css,
           mappings,
           colorsLess
@@ -356,8 +373,8 @@ function generateTheme({
         const regex = /.(?=\S*['-])([.a-zA-Z0-9'-]+)\ {\n\ \ color:\ (.*);/g;
         themeCompiledVars = getMatches(css, regex);
         content = `${content}\n${colorsLess}`;
-        return render(content, lessPaths).then(({ css }) => {
-          return getCssModulesStyles(stylesDir).then(customCss => {
+        return render(content, Object.assign({ paths: lessPaths }, options)).then(({ css }) => {
+          return getCssModulesStyles(stylesDir, include, options).then(customCss => {
             return [
               `${customCss}\n${css}`,
               mappings,
