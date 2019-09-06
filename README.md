@@ -21,7 +21,7 @@ const options = {
   mainLessFile: path.join(__dirname, './src/styles/index.less'), // (Optional) less main file which imports all styles
   themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used)
   outputFilePath: path.join(__dirname, './public/color.less'), // if provided, file will be created with generated less/styles
-  include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value.
+  include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value. It will be used as path.join(stylesDir, './**/*.less') to relative path.
   options: {} // (Optional) less options
 }
 
