@@ -416,9 +416,12 @@ function generateTheme({
         css = uniqueCss(css);
 
         if (outputFilePath) {
-          const folderDir = outputFilePath.match(/(.*\/)[^\/]+$/)[1];
-          if (!fs.existsSync(folderDir)) {
-            fs.mkdirSync(folderDir);
+          const folderDirMatch = outputFilePath.match(/(.*\/)[^\/]+$/);
+          if (folderDirMatch) {
+            const folderDir = folderDirMatch[1];
+            if (!fs.existsSync(folderDir)) {
+              fs.mkdirSync(folderDir);
+            }
           }
           fs.writeFileSync(outputFilePath, css);
           console.log(
