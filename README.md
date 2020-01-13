@@ -4,7 +4,7 @@ This script generates color specific styles/less file which you can use to chang
 
 ## Install
 ```
-$ npm install theme-color-generator
+$ npm install -D theme-color-generator
 ```
 
 ## Demo
@@ -18,7 +18,6 @@ const { generateTheme } = require('theme-color-generator');
 const options = {
   stylesDir: path.join(__dirname, './src/styles'), // styles directory containing all less files
   varFile: path.join(__dirname, './src/styles/variables.less'), // include all color variables in `varFile` that you want to change dynamically
-  mainLessFile: path.join(__dirname, './src/styles/index.less'), // (Optional) less main file which imports all styles
   themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used)
   outputFilePath: path.join(__dirname, './public/color.less'), // if provided, file will be created with generated less/styles
   include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value. It will be used as path.join(stylesDir, './**/*.less') to relative path.
@@ -50,7 +49,7 @@ Add following lines in your main html file
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
 ```
 
-Now you can update colors by updating less avriables like this
+Now you can update colors by updating less variables like this
 
 ```
 window.less.modifyVars({
