@@ -9,6 +9,10 @@
 # Next
 
 
+# 1.3.2
+1. <font color=blue>增强</font> 优化从`outputFilePath`获取输出文件路径，避免执行出错
+
+
 # 1.3.1
 1. <font color=red>修复</font> 输出主题色文件时判断路径是否存在，如不存在则创建该路径
 
