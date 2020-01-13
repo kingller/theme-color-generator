@@ -8,6 +8,11 @@
 
 # Next
 
+
+# 1.3.1
+1. <font color=red>修复</font> 输出主题色文件时判断路径是否存在，如不存在则创建该路径
+
+
 # 1.3.0
 1. <font color=green>新增</font> `include`指定包含文件
 2. <font color=green>新增</font> `options`设置`less`参数

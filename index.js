@@ -69,7 +69,7 @@ function generateColorMap(content) {
         // } else if (isValidColor(color)) {
         //   prev[varName] = color;
         // }
-          prev[varName] = color;
+        prev[varName] = color;
         return prev;
       } catch (e) {
         console.log("e", e);
@@ -106,27 +106,27 @@ const reducePlugin = postcss.plugin("reducePlugin", (themeCompiledVars) => {
     let removeRule = true;
     rule.walkDecls(decl => {
       let isNotColorProp = !decl.prop.includes("color") &&
-          !decl.prop.includes("background") &&
-          !decl.prop.includes("border") &&
-          !decl.prop.includes("box-shadow") &&
-          !decl.prop.includes("outline") &&
-          !decl.prop.includes("stroke") ||
-          !decl.value.includes("#") &&
-          !decl.value.includes("rgb") &&
-          !decl.value.includes("hsl");
+        !decl.prop.includes("background") &&
+        !decl.prop.includes("border") &&
+        !decl.prop.includes("box-shadow") &&
+        !decl.prop.includes("outline") &&
+        !decl.prop.includes("stroke") ||
+        !decl.value.includes("#") &&
+        !decl.value.includes("rgb") &&
+        !decl.value.includes("hsl");
 
       let isThemeColor = false;
       if (!isNotColorProp) {
-          for (let i = 0; i < themeValues.length; i++) {
-              isThemeColor = decl.value.includes(themeValues[i]);
-              if (isThemeColor) {
-                  break;
-              }
+        for (let i = 0; i < themeValues.length; i++) {
+          isThemeColor = decl.value.includes(themeValues[i]);
+          if (isThemeColor) {
+            break;
           }
+        }
       }
 
       if (
-          !isThemeColor
+        !isThemeColor
       ) {
         decl.remove();
       } else {
@@ -236,19 +236,19 @@ function isValidColor(color) {
 function getCssModulesStyles(stylesDir, include, options) {
   let styles = [];
   if (include) {
-      if (!Array.isArray(include)) {
-          include = null;
-          console.error('theme-color-generator: Compiler option \'include\' requires a value of type Array');
-      }
+    if (!Array.isArray(include)) {
+      include = null;
+      console.error('theme-color-generator: Compiler option \'include\' requires a value of type Array');
+    }
   }
   if (!include || include.length === 0) {
-      include = ['./**/*.less'];
+    include = ['./**/*.less'];
   }
-  include.forEach(function(dir) {
-      if (dir && /^(\.{0,2}|~)\//.test(dir)) {
-          dir = path.join(stylesDir, dir);
-      }
-      styles.push(...glob.sync(dir))
+  include.forEach(function (dir) {
+    if (dir && /^(\.{0,2}|~)\//.test(dir)) {
+      dir = path.join(stylesDir, dir);
+    }
+    styles.push(...glob.sync(dir))
   });
 
   return Promise.all(
@@ -276,26 +276,26 @@ function getCssModulesStyles(stylesDir, include, options) {
  remove duplicate css
  */
 function uniqueCss(css) {
-    if (!css) {
-        return '';
-    }
+  if (!css) {
+    return '';
+  }
 
-    css = new CleanCSS({
-        compatibility: 'ie9',
-        format: {
-            breaks: {afterAtRule: true, afterRuleEnds: true}
-        }
-    }).minify(css).styles;
-
-    let array = css.split('\n');
-    let res = [];
-    for (let i = 0, len = array.length; i < len; i++) {
-        let current = array[i];
-        if (res.indexOf(current) === -1) {
-            res.push(current);
-        }
+  css = new CleanCSS({
+    compatibility: 'ie9',
+    format: {
+      breaks: { afterAtRule: true, afterRuleEnds: true }
     }
-    return res.join('\n');
+  }).minify(css).styles;
+
+  let array = css.split('\n');
+  let res = [];
+  for (let i = 0, len = array.length; i < len; i++) {
+    let current = array[i];
+    if (res.indexOf(current) === -1) {
+      res.push(current);
+    }
+  }
+  return res.join('\n');
 }
 
 /*
@@ -337,7 +337,7 @@ function generateTheme({
       src: varFile
     })
       .then(colorsLess => {
-        const mappings = Object.assign(generateColorMap(colorsLess), mainLessFile? generateColorMap(mainLessFile): {});
+        const mappings = Object.assign(generateColorMap(colorsLess), mainLessFile ? generateColorMap(mainLessFile) : {});
         return [mappings, colorsLess];
       })
       .then(([mappings, colorsLess]) => {
@@ -346,14 +346,14 @@ function generateTheme({
          If not pass in themeVariables, the variables in varFile will be used
          */
         if (!themeVariables) {
-            let varJs = lessToJs(fs.readFileSync(varFile, 'utf8'));
-            themeVars.forEach(varName => {
-                delete varJs[varName];
-            });
-            themeVars.push(...Object.keys(varJs));
+          let varJs = lessToJs(fs.readFileSync(varFile, 'utf8'));
+          themeVars.forEach(varName => {
+            delete varJs[varName];
+          });
+          themeVars.push(...Object.keys(varJs));
         }
         if (!themeVars.length) {
-            themeVars.push("@theme-color");
+          themeVars.push("@theme-color");
         }
         themeVars = themeVars.filter(name => name in mappings);
         themeVars.forEach(varName => {
@@ -381,7 +381,7 @@ function generateTheme({
               colorsLess
             ];
           })
-          
+
         });
       })
       .then(([css, mappings, colorsLess]) => {
@@ -416,6 +416,10 @@ function generateTheme({
         css = uniqueCss(css);
 
         if (outputFilePath) {
+          const folderDir = outputFilePath.match(/(.*\/)[^\/]+$/)[1];
+          if (!fs.existsSync(folderDir)) {
+            fs.mkdirSync(folderDir);
+          }
           fs.writeFileSync(outputFilePath, css);
           console.log(
             `Theme generated successfully. OutputFile: ${outputFilePath}`
