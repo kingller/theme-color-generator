@@ -9,6 +9,10 @@
 # Next
 
 
+# 1.4.0
+1. <font color=green>新增</font> `themeReplacement`参数，支持生成时替换变量文件`varFile`中参数的值
+
+
 # 1.3.2
 1. <font color=blue>增强</font> 优化从`outputFilePath`获取输出文件路径，避免执行出错
 
