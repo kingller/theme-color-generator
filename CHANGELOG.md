@@ -9,6 +9,17 @@
 # Next
 
 
+# 1.5.0
+1. <font color=orange>修改</font> 包升级
+```
+clean-css               4.2.1   =>  5.2.2
+glob                    7.1.3   =>  7.2.0
+less                    3.8.1   =>  4.1.2
+less-bundle-promise     1.0.7   =>  1.0.11
+postcss                 7.0.5   =>  8.4.5
+```
+
+
 # 1.4.0
 1. <font color=green>新增</font> `themeReplacement`参数，支持生成时替换变量文件`varFile`中参数的值
 
