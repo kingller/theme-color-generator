@@ -367,7 +367,7 @@ function generateTheme({
       
       - stylesDir - styles directory containing all less files
       - varFile - variable file containing your custom variables
-      - colorFile - which less variables need to be converted from css variables in file
+      - colorFile - which less variables in the file need to be replaced from css variables in all less files
       - colorFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in colorFile
     */
         let content = '';
