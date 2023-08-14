@@ -18,6 +18,8 @@ const { generateTheme } = require('theme-color-generator');
 const options = {
   stylesDir: path.join(__dirname, './src/styles'), // styles directory containing all less files
   varFile: path.join(__dirname, './src/styles/variables.less'), // include all color variables in `varFile` that you want to change dynamically
+  colorFile: path.join(__dirname, './src/styles/color-variables.less'), // (Optional) which less variables need to be converted from css variables in file
+  colorFileThemeRegex: /@primary-\d/, // (Optional) regex codes to match your color variable values which variables are related to theme color in colorFile. most of the time you don't need this.
   themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used)
   outputFilePath: path.join(__dirname, './public/color.less'), // if provided, file will be created with generated less/styles
   include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value. It will be used as path.join(stylesDir, './**/*.less') to relative path.
@@ -46,7 +48,7 @@ Add following lines in your main html file
     env: 'production'
   };
 </script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/less.js/4.1.2/less.min.js"></script>
 ```
 
 Now you can update colors by updating less variables like this

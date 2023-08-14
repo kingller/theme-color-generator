@@ -76,6 +76,20 @@ function generateColorMap(content) {
         }, {});
 }
 
+function generateColorFileVarMap({ colorFile, colorFileThemeRegex }) {
+    const themeVarsRegex = colorFileThemeRegex || /@primary-\d/;
+    if (colorFile) {
+        let colorVarJs = lessToJs(fs.readFileSync(colorFile, 'utf8'));
+        Object.keys(colorVarJs).forEach((varName) => {
+            if (!themeVarsRegex.test(varName)) {
+                delete colorVarJs[varName];
+            }
+        });
+        return colorVarJs;
+    }
+    return {};
+}
+
 /*
  This plugin will remove all css rules except those are related to colors
  e.g.
@@ -188,8 +202,8 @@ function render(text, options) {
     }
 
 */
-function getLessVars(filtPath) {
-    const sheet = fs.readFileSync(filtPath).toString();
+function getLessVars(filePath) {
+    const sheet = fs.readFileSync(filePath).toString();
     const lessVars = {};
     const matches = sheet.match(/@(.*:[^;]*)/g) || [];
 
@@ -231,7 +245,29 @@ function isValidColor(color) {
     return /^(rgb|hsl)a?\((\d+%?(deg|rad|grad|turn)?[,\s]+){2,3}[\s\/]*[\d\.]+%?\)$/i.test(color);
 }
 
-function getCssModulesStyles(stylesDir, include, options) {
+// 替换 CSS 中的变量
+function replaceCssVariablesToLess({ filePath, colorFile, importedVariables }) {
+    const source = fs.readFileSync(filePath, 'utf-8').toString();
+    if (
+        !importedVariables ||
+        Object.keys(importedVariables).length === 0 ||
+        !source ||
+        !/var\(--(.*?)\)/.test(source)
+    ) {
+        return source;
+    }
+
+    // 把 CSS 变量替换成 less 变量
+    let cssToLessVariables = source.replace(/var\(--(.*?)\)/g, (_, variableName) => {
+        const lessVarName = `@${variableName.trim()}`;
+        return importedVariables[lessVarName] ? lessVarName : _;
+    });
+    // import colorFile 编译替换的 less 变量
+    cssToLessVariables = `@import '${colorFile}';\n${cssToLessVariables}`;
+    return cssToLessVariables;
+}
+
+function getCssModulesStyles(stylesDir, include, options, colorFile) {
     let styles = [];
     if (include) {
         if (!Array.isArray(include)) {
@@ -249,11 +285,20 @@ function getCssModulesStyles(stylesDir, include, options) {
         styles.push(...glob.sync(dir));
     });
 
+    let importedVariables = null;
+    if (colorFile) {
+        // 读取 colorFile 变量文件内容
+        const lessVarContent = fs.readFileSync(colorFile, 'utf-8');
+
+        // 获取所有导入的变量
+        importedVariables = lessToJs(lessVarContent);
+    }
+
     return Promise.all(
         styles.map((p) =>
             less
                 .render(
-                    fs.readFileSync(p).toString(),
+                    replaceCssVariablesToLess({ filePath: p, colorFile, importedVariables }),
                     Object.assign(
                         {
                             paths: [stylesDir],
@@ -307,13 +352,14 @@ function uniqueCss(css) {
 */
 function generateTheme({
     stylesDir,
-    mainLessFile,
     varFile,
     outputFilePath,
     themeVariables,
     include,
     options,
     themeReplacement,
+    colorFile,
+    colorFileThemeRegex,
 }) {
     return new Promise((resolve, reject) => {
         /*
@@ -321,7 +367,8 @@ function generateTheme({
       
       - stylesDir - styles directory containing all less files
       - varFile - variable file containing your custom variables
-      - mainLessFile - less main file which imports all styles
+      - colorFile - which less variables need to be converted from css variables in file
+      - colorFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in colorFile
     */
         let content = '';
         // const hashCode = hash.sha256().update(content).digest('hex');
@@ -338,10 +385,17 @@ function generateTheme({
             src: varFile,
         })
             .then((colorsLess) => {
-                const mappings = Object.assign(
-                    generateColorMap(colorsLess),
-                    mainLessFile ? generateColorMap(mainLessFile) : {}
-                );
+                const colorFileVarMapping = generateColorFileVarMap({ colorFile, colorFileThemeRegex });
+                const mappings = Object.assign(generateColorMap(colorsLess), colorFileVarMapping);
+                const colorFileVarNames = Object.keys(colorFileVarMapping);
+                if (colorFileVarNames.length > 0) {
+                    if (!/\n$/.test(colorsLess)) {
+                        colorsLess += '\n';
+                    }
+                    colorFileVarNames.forEach((varName) => {
+                        colorsLess += `${varName}: ${colorFileVarMapping[varName]};\n`;
+                    });
+                }
                 return [mappings, colorsLess];
             })
             .then(([mappings, colorsLess]) => {
@@ -350,7 +404,7 @@ function generateTheme({
          If not pass in themeVariables, the variables in varFile will be used
          */
                 if (!themeVariables) {
-                    let varJs = lessToJs(fs.readFileSync(varFile, 'utf8'));
+                    let varJs = Object.assign({}, mappings);
                     themeVars.forEach((varName) => {
                         delete varJs[varName];
                     });
@@ -378,7 +432,7 @@ function generateTheme({
                 themeCompiledVars = getMatches(css, regex);
                 content = `${content}\n${colorsLess}`;
                 return render(content, Object.assign({ paths: lessPaths }, options)).then(({ css }) => {
-                    return getCssModulesStyles(stylesDir, include, options).then((customCss) => {
+                    return getCssModulesStyles(stylesDir, include, options, colorFile).then((customCss) => {
                         return [`${customCss}\n${css}`, mappings, colorsLess];
                     });
                 });
@@ -387,19 +441,19 @@ function generateTheme({
                 return postcss([reducePlugin(themeCompiledVars)])
                     .process(css, {
                         parser: less.parser,
-                        from: mainLessFile | varFile,
+                        from: varFile,
                     })
                     .then(({ css }) => [css, mappings, colorsLess]);
             })
             .then(([css, mappings, colorsLess]) => {
                 Object.keys(themeCompiledVars).forEach((varName) => {
                     let color;
-                    if (/(.*)-(\d)/.test(varName)) {
-                        color = themeCompiledVars[varName];
-                        varName = getShade(varName);
-                    } else {
-                        color = themeCompiledVars[varName];
-                    }
+                    // if (/(.*)-(\d)/.test(varName)) {
+                    //     color = themeCompiledVars[varName];
+                    //     varName = getShade(varName);
+                    // } else {
+                    color = themeCompiledVars[varName];
+                    // }
                     color = color.replace('(', '\\(').replace(')', '\\)');
                     css = css.replace(new RegExp(`${color}`, 'g'), varName);
                 });
