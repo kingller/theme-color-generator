@@ -9,12 +9,12 @@
     "start": "npm run color && react-scripts start"
   },
   "dependencies": {
-    "react": "^16.6.1",
-    "react-app-rewired": "1.6.2",
+    "react": "^16.13.1",
+    "react-app-rewired": "2.2.1",
     "react-color": "^2.14.1",
-    "react-dom": "^16.6.1",
-    "react-scripts": "2.1.1",
-    "theme-color-generator": "^1.4.0"
+    "react-dom": "^16.13.1",
+    "react-scripts": "5.0.1",
+    "theme-color-generator": "^2.0.0"
   },
   "browserslist": [
     ">0.2%",
