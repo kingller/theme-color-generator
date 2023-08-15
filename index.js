@@ -76,16 +76,16 @@ function generateColorMap(content) {
         }, {});
 }
 
-function generateColorFileVarMap({ colorFile, colorFileThemeRegex }) {
-    const themeVarsRegex = colorFileThemeRegex || /@primary-\d/;
-    if (colorFile) {
-        let colorVarJs = lessToJs(fs.readFileSync(colorFile, 'utf8'));
-        Object.keys(colorVarJs).forEach((varName) => {
+function generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex }) {
+    const themeVarsRegex = globalVarFileThemeRegex || /@primary-\d/;
+    if (globalVarFile) {
+        let globalVarJs = lessToJs(fs.readFileSync(globalVarFile, 'utf8'));
+        Object.keys(globalVarJs).forEach((varName) => {
             if (!themeVarsRegex.test(varName)) {
-                delete colorVarJs[varName];
+                delete globalVarJs[varName];
             }
         });
-        return colorVarJs;
+        return globalVarJs;
     }
     return {};
 }
@@ -246,7 +246,7 @@ function isValidColor(color) {
 }
 
 // 替换 CSS 中的变量
-function replaceCssVariablesToLess({ filePath, colorFile, importedVariables }) {
+function replaceCssVariablesToLess({ filePath, globalVarFile, importedVariables }) {
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     if (
         !importedVariables ||
@@ -262,12 +262,12 @@ function replaceCssVariablesToLess({ filePath, colorFile, importedVariables }) {
         const lessVarName = `@${variableName.trim()}`;
         return importedVariables[lessVarName] ? lessVarName : _;
     });
-    // import colorFile 编译替换的 less 变量
-    cssToLessVariables = `@import '${colorFile}';\n${cssToLessVariables}`;
+    // import globalVarFile 替换的 less 变量
+    cssToLessVariables = `@import '${globalVarFile}';\n${cssToLessVariables}`;
     return cssToLessVariables;
 }
 
-function getCssModulesStyles(stylesDir, include, options, colorFile) {
+function getCssModulesStyles(stylesDir, include, options, globalVarFile) {
     let styles = [];
     if (include) {
         if (!Array.isArray(include)) {
@@ -286,9 +286,9 @@ function getCssModulesStyles(stylesDir, include, options, colorFile) {
     });
 
     let importedVariables = null;
-    if (colorFile) {
-        // 读取 colorFile 变量文件内容
-        const lessVarContent = fs.readFileSync(colorFile, 'utf-8');
+    if (globalVarFile) {
+        // 读取 globalVarFile 变量文件内容
+        const lessVarContent = fs.readFileSync(globalVarFile, 'utf-8');
 
         // 获取所有导入的变量
         importedVariables = lessToJs(lessVarContent);
@@ -298,7 +298,7 @@ function getCssModulesStyles(stylesDir, include, options, colorFile) {
         styles.map((p) =>
             less
                 .render(
-                    replaceCssVariablesToLess({ filePath: p, colorFile, importedVariables }),
+                    replaceCssVariablesToLess({ filePath: p, globalVarFile, importedVariables }),
                     Object.assign(
                         {
                             paths: [stylesDir],
@@ -358,8 +358,8 @@ function generateTheme({
     include,
     options,
     themeReplacement,
-    colorFile,
-    colorFileThemeRegex,
+    globalVarFile,
+    globalVarFileThemeRegex,
 }) {
     return new Promise((resolve, reject) => {
         /*
@@ -367,8 +367,8 @@ function generateTheme({
       
       - stylesDir - styles directory containing all less files
       - varFile - variable file containing your custom variables
-      - colorFile - which less variables in the file need to be replaced from css variables in all less files
-      - colorFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in colorFile
+      - globalVarFile - which less variables in the file will replace css variables in all less files
+      - globalVarFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in globalVarFile
     */
         let content = '';
         // const hashCode = hash.sha256().update(content).digest('hex');
@@ -385,15 +385,15 @@ function generateTheme({
             src: varFile,
         })
             .then((colorsLess) => {
-                const colorFileVarMapping = generateColorFileVarMap({ colorFile, colorFileThemeRegex });
-                const mappings = Object.assign(generateColorMap(colorsLess), colorFileVarMapping);
-                const colorFileVarNames = Object.keys(colorFileVarMapping);
+                const globalVarMapping = generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex });
+                const mappings = Object.assign(generateColorMap(colorsLess), globalVarMapping);
+                const colorFileVarNames = Object.keys(globalVarMapping);
                 if (colorFileVarNames.length > 0) {
                     if (!/\n$/.test(colorsLess)) {
                         colorsLess += '\n';
                     }
                     colorFileVarNames.forEach((varName) => {
-                        colorsLess += `${varName}: ${colorFileVarMapping[varName]};\n`;
+                        colorsLess += `${varName}: ${globalVarMapping[varName]};\n`;
                     });
                 }
                 return [mappings, colorsLess];
@@ -432,7 +432,7 @@ function generateTheme({
                 themeCompiledVars = getMatches(css, regex);
                 content = `${content}\n${colorsLess}`;
                 return render(content, Object.assign({ paths: lessPaths }, options)).then(({ css }) => {
-                    return getCssModulesStyles(stylesDir, include, options, colorFile).then((customCss) => {
+                    return getCssModulesStyles(stylesDir, include, options, globalVarFile).then((customCss) => {
                         return [`${customCss}\n${css}`, mappings, colorsLess];
                     });
                 });

@@ -9,6 +9,19 @@
 # Next
 
 
+# 2.0.0
+1. <font color=green>新增</font> `globalVarFile` 配置 `less` 变量文件路径，文件中的 `less` 变量会从所有less文件中把对应css变量替换成less变量
+2. <font color=green>新增</font> `globalVarFileThemeRegex` 配置正则表达式匹配出 `globalVarFile` 文件中与主题色相关的变量。大多数情况下不需要使用。
+3. <font color=orange>修改</font> 包升级
+```
+clean-css               5.2.2   =>  5.3.2
+glob                    7.2.0   =>  10.3.3
+hash.js                 1.1.5   =>  1.1.7
+less                    4.1.2   =>  4.2.0
+postcss                 8.4.5   =>  8.4.27
+```
+
+
 # 1.5.0
 1. <font color=orange>修改</font> 包升级
 ```
