@@ -21,7 +21,7 @@ const options = {
   globalVarFile: path.join(__dirname, './src/styles/global-variables.less'), // (Optional) which less variables in the file will replace css variables in all less files. For example, if @primary-1 is defined in the file, var(--primary-1) will be replaced by @primary-1.
   globalVarFileThemeRegex: /@primary-\d/, // (Optional) regex codes to match your color variable values which variables are related to theme color in colorVarFile. most of the time you don't need this.
   findMissVar - (Optional) boolean. the default value is false. if the variable referenced in globalVarFile is not found in varFile, will it be automatically added. most of the time you don't need this.
-  themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used)
+  themeVariables: ['@theme-color'], // (Optional) Specify variables to use (If not set, all variables in varFile will be used). most of the time you don't need this.
   outputFilePath: path.join(__dirname, './public/color.less'), // if provided, file will be created with generated less/styles
   include: ['./**/*.less'], // (Optional) Specify the included file. Here is its default value. It will be used as path.join(stylesDir, './**/*.less') to relative path.
   options: {} // (Optional) less options
