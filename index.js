@@ -76,15 +76,105 @@ function generateColorMap(content) {
         }, {});
 }
 
-function generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex }) {
+function getVarNames(content) {
+    if (!content) {
+        return null;
+    }
+    const matches = content.match(/@[\w-]+/g);
+    return matches;
+}
+
+function getImportFiles({ globalVarFile, globalVarContent }) {
+    if (!globalVarContent) {
+        return null;
+    }
+    const importMatches = globalVarContent.match(/@import ('(.*?)'|url\('(.*?)'\))/g);
+    if (!importMatches) {
+        return null;
+    }
+    const importFiles = importMatches.map(function (importStr) {
+        const importFilePath = importStr.match(/'(.*?)'/)[1];
+        return path.join(path.dirname(globalVarFile), importFilePath);
+    });
+    return importFiles;
+}
+
+function getImportVars({ globalVarFile, globalVarContent }) {
+    const importVars = {};
+    const importFiles = getImportFiles({ globalVarFile, globalVarContent });
+    importFiles.forEach((importFilePath) => {
+        const importFileVarJs = lessToJs(fs.readFileSync(importFilePath, 'utf8'));
+        Object.assign(importVars, importFileVarJs);
+    });
+    return importVars;
+}
+
+function recursiveSearchForVariables({
+    varValue,
+    globalVarFile,
+    globalVarContent,
+    varMapping,
+    newGlobalVarJs,
+    fetchOnceInfo,
+}) {
+    const varNamesInValue = getVarNames(varValue);
+    if (varNamesInValue) {
+        for (let varName of varNamesInValue) {
+            if (!newGlobalVarJs[varName] && !varMapping[varName]) {
+                if (!fetchOnceInfo.importVarMapping) {
+                    fetchOnceInfo.importVarMapping = getImportVars({ globalVarFile, globalVarContent });
+                }
+                const { importVarMapping } = fetchOnceInfo;
+                if (importVarMapping) {
+                    const importVarValue = importVarMapping[varName];
+                    if (importVarValue) {
+                        newGlobalVarJs[varName] = importVarValue;
+                        recursiveSearchForVariables({
+                            varValue: importVarValue,
+                            globalVarFile,
+                            globalVarContent,
+                            varMapping,
+                            newGlobalVarJs,
+                            fetchOnceInfo,
+                        });
+                    }
+                }
+            }
+        }
+    }
+}
+
+// if the variable referenced in globalVarFile is not found in varFile, will it be automatically added
+function findAndAddMissVar({ globalVarJs, globalVarFile, globalVarContent, varMapping }) {
+    const newGlobalVarJs = Object.assign({}, globalVarJs);
+    const fetchOnceInfo = {};
+    Object.keys(globalVarJs).forEach((varName) => {
+        const varValue = globalVarJs[varName];
+        recursiveSearchForVariables({
+            varValue,
+            globalVarFile,
+            globalVarContent,
+            varMapping,
+            newGlobalVarJs,
+            fetchOnceInfo,
+        });
+    });
+    return newGlobalVarJs;
+}
+
+function generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex, varMapping, findMissVar }) {
     const themeVarsRegex = globalVarFileThemeRegex || /@primary-\d/;
     if (globalVarFile) {
+        const globalVarContent = fs.readFileSync(globalVarFile, 'utf8');
         let globalVarJs = lessToJs(fs.readFileSync(globalVarFile, 'utf8'));
         Object.keys(globalVarJs).forEach((varName) => {
             if (!themeVarsRegex.test(varName)) {
                 delete globalVarJs[varName];
             }
         });
+        if (findMissVar) {
+            globalVarJs = findAndAddMissVar({ globalVarJs, globalVarFile, globalVarContent, varMapping });
+        }
         return globalVarJs;
     }
     return {};
@@ -360,6 +450,7 @@ function generateTheme({
     themeReplacement,
     globalVarFile,
     globalVarFileThemeRegex,
+    findMissVar,
 }) {
     return new Promise((resolve, reject) => {
         /*
@@ -369,6 +460,7 @@ function generateTheme({
       - varFile - variable file containing your custom variables
       - globalVarFile - which less variables in the file will replace css variables in all less files
       - globalVarFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in globalVarFile
+      - findMissVar - boolean. the default value is false. if the variable referenced in globalVarFile is not found in varFile, will it be automatically added
     */
         let content = '';
         // const hashCode = hash.sha256().update(content).digest('hex');
@@ -385,8 +477,14 @@ function generateTheme({
             src: varFile,
         })
             .then((colorsLess) => {
-                const globalVarMapping = generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex });
-                const mappings = Object.assign(generateColorMap(colorsLess), globalVarMapping);
+                const varMapping = generateColorMap(colorsLess);
+                const globalVarMapping = generateGlobalVarMap({
+                    globalVarFile,
+                    globalVarFileThemeRegex,
+                    varMapping,
+                    findMissVar,
+                });
+                const mappings = Object.assign({}, varMapping, globalVarMapping);
                 const colorFileVarNames = Object.keys(globalVarMapping);
                 if (colorFileVarNames.length > 0) {
                     if (!/\n$/.test(colorsLess)) {

@@ -9,6 +9,10 @@
 # Next
 
 
+# 2.1.0
+1. <font color=green>新增</font> `findMissVar` 配置 `globalVarFile` 文件中与主题色相关的变量引用了其它文件的变量且该变量不是 `varFile` 中定义的变量时，是否要把引用的变量加入到主题色变量里来，防止编译时报错。
+
+
 # 2.0.0
 1. <font color=green>新增</font> `globalVarFile` 配置 `less` 变量文件路径，文件中的 `less` 变量会从所有less文件中把对应css变量替换成less变量
 2. <font color=green>新增</font> `globalVarFileThemeRegex` 配置正则表达式匹配出 `globalVarFile` 文件中与主题色相关的变量。大多数情况下不需要使用。
