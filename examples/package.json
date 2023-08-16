@@ -14,7 +14,7 @@
     "react-color": "^2.14.1",
     "react-dom": "^16.13.1",
     "react-scripts": "5.0.1",
-    "theme-color-generator": "^2.0.0"
+    "theme-color-generator": "^2.1.0"
   },
   "browserslist": [
     ">0.2%",
