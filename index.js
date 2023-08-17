@@ -88,7 +88,7 @@ function getImportFiles({ globalVarFile, globalVarContent }) {
     if (!globalVarContent) {
         return null;
     }
-    const importMatches = globalVarContent.match(/@import ('(.*?)'|url\('(.*?)'\))/g);
+    const importMatches = globalVarContent.match(/@import\s+('(.*?)'|url\('(.*?)'\))/g);
     if (!importMatches) {
         return null;
     }
@@ -460,7 +460,7 @@ function generateTheme({
       - varFile - variable file containing your custom variables
       - globalVarFile - which less variables in the file will replace css variables in all less files
       - globalVarFileThemeRegex - regex codes to match your color variable values which variables are related to theme color in globalVarFile
-      - findMissVar - boolean. the default value is false. if the variable referenced in globalVarFile is not found in varFile, will it be automatically added
+      - findMissVar - boolean. The default value is false. If the variable referenced in globalVarFile is not found in varFile, it will look for the import file and add it.
     */
         let content = '';
         // const hashCode = hash.sha256().update(content).digest('hex');

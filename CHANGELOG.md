@@ -9,6 +9,10 @@
 # Next
 
 
+# 2.1.1
+1. <font color=red>修复</font> `findMissVar` 为 `true` 时查找引用文件时正则表达式 `@import ` 部分改成 `@import\s+` 
+
+
 # 2.1.0
 1. <font color=green>新增</font> `findMissVar` 配置 `globalVarFile` 文件中与主题色相关的变量引用了其它文件的变量且该变量不是 `varFile` 中定义的变量时，是否要把引用的变量加入到主题色变量里来，防止编译时报错。
 
