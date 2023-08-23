@@ -9,6 +9,10 @@
 # Next
 
 
+# 2.2.0
+1. <font color=orange>修改</font> `globalVarFileThemeRegex` 匹配主题色变量默认值改为 `/@primary-/`
+
+
 # 2.1.1
 1. <font color=red>修复</font> `findMissVar` 为 `true` 时查找引用文件时正则表达式 `@import ` 部分改成 `@import\s+` 
 

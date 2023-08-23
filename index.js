@@ -163,7 +163,7 @@ function findAndAddMissVar({ globalVarJs, globalVarFile, globalVarContent, varMa
 }
 
 function generateGlobalVarMap({ globalVarFile, globalVarFileThemeRegex, varMapping, findMissVar }) {
-    const themeVarsRegex = globalVarFileThemeRegex || /@primary-\d/;
+    const themeVarsRegex = globalVarFileThemeRegex || /@primary-/;
     if (globalVarFile) {
         const globalVarContent = fs.readFileSync(globalVarFile, 'utf8');
         let globalVarJs = lessToJs(fs.readFileSync(globalVarFile, 'utf8'));
